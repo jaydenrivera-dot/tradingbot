@@ -1,0 +1,18 @@
+# Security: Do NOT track environment variables
+.env
+
+# Python: Ignore local virtual environments and cache
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.venv/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Flask/Development logs
+instance/
+.pytest_cache/
