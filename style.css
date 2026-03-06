@@ -68,3 +68,14 @@ header {
     text-align: center;
     color: var(--primary);
 }
+.status-dot {
+    height: 10px;
+    width: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    background-color: #94a3b8; /* Grey (Unknown) */
+}
+
+.status-dot.online { background-color: #22c55e; } /* Green */
+.status-dot.loading { background-color: #eab308; } /* Yellow */
+.status-dot.offline { background-color: #ef4444; } /* Red */
