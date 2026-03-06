@@ -69,3 +69,34 @@ async function pingServer() {
 
 // Ping automatically when the page loads
 window.onload = pingServer;
+async function triggerAutoTrade() {
+    const statusMsg = document.getElementById('botStatus');
+    
+    try {
+        const response = await fetch('http://localhost:5000/api/trade', { method: 'POST' });
+        const result = await response.json();
+
+        if (!response.ok) {
+            // This triggers if the backend sends a 500 error
+            showOnSiteError(result.message);
+            return;
+        }
+
+        statusMsg.innerText = "Trade Successful!";
+    } catch (err) {
+        // This triggers if the server is offline or unreachable
+        showOnSiteError("Server Unreachable: The bot might be sleeping.");
+    }
+}
+
+function showOnSiteError(msg) {
+    // Create a toast notification element
+    const toast = document.createElement('div');
+    toast.className = 'toast-error';
+    toast.innerHTML = `<strong>⚠️ Bot Alert:</strong> ${msg}`;
+    
+    document.body.appendChild(toast);
+
+    // Automatically remove after 5 seconds
+    setTimeout(() => { toast.remove(); }, 5000);
+}
