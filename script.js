@@ -52,3 +52,20 @@ displayStocks();
 const response = await fetch('https://tradebot-backend.onrender.com/api/trade', { 
     method: 'POST',
     // ... rest of the code
+// Add this to your script.js
+async function pingServer() {
+    const statusDot = document.getElementById('serverStatus');
+    statusDot.className = 'status-dot loading'; // Show "loading" state
+    
+    try {
+        const response = await fetch('https://your-render-url.onrender.com/api/health');
+        if (response.ok) {
+            statusDot.className = 'status-dot online'; // Green light
+        }
+    } catch (error) {
+        statusDot.className = 'status-dot offline'; // Red light
+    }
+}
+
+// Ping automatically when the page loads
+window.onload = pingServer;
