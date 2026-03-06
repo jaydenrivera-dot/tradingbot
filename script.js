@@ -48,3 +48,7 @@ autoBtn.addEventListener('click', () => {
 
 // Initialize
 displayStocks();
+// Change this from localhost to your new Render URL
+const response = await fetch('https://tradebot-backend.onrender.com/api/trade', { 
+    method: 'POST',
+    // ... rest of the code
