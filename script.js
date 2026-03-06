@@ -160,3 +160,56 @@ async function triggerAutoTrade() {
         showOnSiteError("Connection lost. Your bot might be waking up.", triggerAutoTrade);
     }
 }
+let retryTimer = null; // Global reference to the timer
+
+function showOnSiteError(msg, retryAction) {
+    const existingToast = document.querySelector('.toast-error');
+    if (existingToast) existingToast.remove();
+    if (retryTimer) clearInterval(retryTimer); // Reset any old countdowns
+
+    const toast = document.createElement('div');
+    toast.className = 'toast-error';
+    
+    let countdown = 5; // Start at 5 seconds
+
+    // 1. Create the UI elements
+    const text = document.createElement('span');
+    text.innerHTML = `<strong>⚠️ Bot Alert:</strong> ${msg}`;
+    
+    const retryBtn = document.createElement('button');
+    retryBtn.className = "btn-retry";
+    retryBtn.innerText = `Retry in ${countdown}s`;
+    
+    const closeBtn = document.createElement('span');
+    closeBtn.innerHTML = " &times;";
+    closeBtn.className = "close-toast";
+
+    // 2. Logic to handle the countdown
+    retryTimer = setInterval(() => {
+        countdown--;
+        retryBtn.innerText = `Retry in ${countdown}s`;
+
+        if (countdown <= 0) {
+            clearInterval(retryTimer);
+            toast.remove();
+            retryAction(); // 3. Automatic Trigger
+        }
+    }, 1000);
+
+    // 4. Manual override
+    retryBtn.onclick = () => {
+        clearInterval(retryTimer);
+        toast.remove();
+        retryAction();
+    };
+
+    closeBtn.onclick = () => {
+        clearInterval(retryTimer);
+        toast.remove();
+    };
+
+    toast.appendChild(text);
+    toast.appendChild(retryBtn);
+    toast.appendChild(closeBtn);
+    document.body.appendChild(toast);
+}
