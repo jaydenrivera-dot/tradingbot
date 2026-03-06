@@ -100,3 +100,63 @@ function showOnSiteError(msg) {
     // Automatically remove after 5 seconds
     setTimeout(() => { toast.remove(); }, 5000);
 }
+/**
+ * Displays a persistent error toast with a Retry button.
+ * @param {string} msg - The error message to display.
+ * @param {Function} retryAction - The function to call when 'Retry' is clicked.
+ */
+function showOnSiteError(msg, retryAction) {
+    // 1. Remove any existing error toasts to avoid clutter
+    const existingToast = document.querySelector('.toast-error');
+    if (existingToast) existingToast.remove();
+
+    const toast = document.createElement('div');
+    toast.className = 'toast-error';
+    
+    // Create the text container
+    const text = document.createElement('span');
+    text.innerHTML = `<strong>⚠️ Bot Alert:</strong> ${msg}`;
+    
+    // 2. Create the Retry Button
+    const retryBtn = document.createElement('button');
+    retryBtn.innerText = "Retry Trade";
+    retryBtn.className = "btn-retry";
+    
+    retryBtn.onclick = () => {
+        toast.remove(); // Clear the error first
+        retryAction();  // Re-trigger the trade
+    };
+
+    // 3. Create a Close Button (X) for dismissal
+    const closeBtn = document.createElement('span');
+    closeBtn.innerHTML = " &times;";
+    closeBtn.className = "close-toast";
+    closeBtn.onclick = () => toast.remove();
+
+    toast.appendChild(text);
+    toast.appendChild(retryBtn);
+    toast.appendChild(closeBtn);
+    document.body.appendChild(toast);
+}
+
+// Update your main trade function to pass itself as the retryAction
+async function triggerAutoTrade() {
+    const statusMsg = document.getElementById('botStatus');
+    statusMsg.innerText = "🤖 Retrying trade...";
+
+    try {
+        const response = await fetch('http://localhost:5000/api/trade', { method: 'POST' });
+        const result = await response.json();
+
+        if (!response.ok) {
+            // Pass the function name 'triggerAutoTrade' so the button knows what to do
+            showOnSiteError(result.message, triggerAutoTrade);
+            return;
+        }
+        
+        // Success logic...
+        statusMsg.innerText = "✅ Trade Successful!";
+    } catch (err) {
+        showOnSiteError("Connection lost. Your bot might be waking up.", triggerAutoTrade);
+    }
+}
