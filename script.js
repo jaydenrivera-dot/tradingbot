@@ -213,3 +213,122 @@ function showOnSiteError(msg, retryAction) {
     toast.appendChild(closeBtn);
     document.body.appendChild(toast);
 }
+let retryCount = 0;
+const MAX_RETRIES = 3;
+let retryTimer = null;
+
+async function triggerAutoTrade() {
+    const statusMsg = document.getElementById('botStatus');
+    statusMsg.innerText = retryCount > 0 ? `🤖 Retrying (${retryCount}/${MAX_RETRIES})...` : "🤖 Executing trade...";
+
+    try {
+        const response = await fetch('http://localhost:5000/api/trade', { method: 'POST' });
+        const result = await response.json();
+
+        if (!response.ok) {
+            handleTradeError(result.message);
+            return;
+        }
+        
+        // SUCCESS: Reset the counter for the next time the user trades
+        retryCount = 0;
+        statusMsg.innerText = "✅ Trade Successful!";
+        addToHistory(result.order.symbol, result.order.price);
+        
+    } catch (err) {
+        handleTradeError("Connection lost. Bot might be waking up.");
+    }
+}
+
+function handleTradeError(msg) {
+    if (retryCount < MAX_RETRIES) {
+        retryCount++;
+        showOnSiteError(`${msg} (Attempt ${retryCount} of ${MAX_RETRIES})`, triggerAutoTrade, true);
+    } else {
+        // MAX RETRIES REACHED: Stop and ask for manual intervention
+        retryCount = 0; // Reset for next manual attempt
+        showOnSiteError("Max retries reached. Please check your Robinhood login or balance manually.", null, false);
+    }
+}
+
+function showOnSiteError(msg, retryAction, allowAutoRetry) {
+    const existingToast = document.querySelector('.toast-error');
+    if (existingToast) existingToast.remove();
+    if (retryTimer) clearInterval(retryTimer);
+
+    const toast = document.createElement('div');
+    toast.className = 'toast-error';
+    
+    const text = document.createElement('span');
+    text.innerHTML = `<strong>⚠️ Alert:</strong> ${msg}`;
+    toast.appendChild(text);
+
+    if (allowAutoRetry && retryAction) {
+        let countdown = 5;
+        const retryBtn = document.createElement('button');
+        retryBtn.className = "btn-retry";
+        retryBtn.innerText = `Retry in ${countdown}s`;
+        
+        retryTimer = setInterval(() => {
+            countdown--;
+            retryBtn.innerText = `Retry in ${countdown}s`;
+            if (countdown <= 0) {
+                clearInterval(retryTimer);
+                toast.remove();
+                retryAction();
+            }
+        }, 1000);
+
+        retryBtn.onclick = () => {
+            clearInterval(retryTimer);
+            toast.remove();
+            retryAction();
+        };
+        toast.appendChild(retryBtn);
+    }
+
+    const closeBtn = document.createElement('span');
+    closeBtn.innerHTML = " &times;";
+    closeBtn.className = "close-toast";
+    closeBtn.onclick = () => {
+        clearInterval(retryTimer);
+        toast.remove();
+    };
+    toast.appendChild(closeBtn);
+    document.body.appendChild(toast);
+}
+function exportToCSV() {
+    // 1. Check if there is even any data to export
+    if (tradeLog.length === 0) {
+        alert("No trade history available to export.");
+        return;
+    }
+
+    // 2. Define the CSV Headers
+    const headers = ["Date/Time", "Stock Symbol", "Action", "Price ($)"];
+    
+    // 3. Convert the tradeLog array into CSV rows
+    const csvContent = [
+        headers.join(","), // Put headers at the top
+        ...tradeLog.map(item => [
+            `"${item.time}"`,   // Use quotes to handle spaces/commas in dates
+            item.symbol,
+            item.action,
+            item.price
+        ].join(","))
+    ].join("\n");
+
+    // 4. Create a "Blob" (the file data)
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+
+    // 5. Create a hidden link to trigger the download
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `TradeBot_Export_${new Date().toISOString().slice(0,10)}.csv`);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click(); // Programmatically click the link to start download
+    document.body.removeChild(link); // Clean up
+}
