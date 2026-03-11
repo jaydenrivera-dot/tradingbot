@@ -445,6 +445,29 @@ function showDashboard() {
     loadHistoryFromSupabase();
     subscribeToTrades();
 }
+window.onload = async () => {
+    // 1. Ask Supabase: "Is there a saved session in this browser?"
+    const { data: { session }, error } = await supabase.auth.getSession();
+
+    if (session) {
+        console.log("Welcome back!", session.user.email);
+        showDashboard(); // User is already logged in, skip the gate
+    } else {
+        // No session found, show the login overlay
+        document.getElementById('login-overlay').style.display = 'flex';
+    }
+};
+// Add this anywhere in your script.js
+supabase.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN') {
+        showDashboard();
+    }
+    if (event === 'SIGNED_OUT') {
+        // Force the app back to the login screen
+        document.getElementById('login-overlay').style.display = 'flex';
+        document.getElementById('dashboard-content').style.display = 'none';
+    }
+});
 
 // 4. Add a Logout Option for safety
 async function handleLogout() {
