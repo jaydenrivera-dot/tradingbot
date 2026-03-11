@@ -406,3 +406,48 @@ function showOnSiteSuccess(msg) {
 
     setTimeout(() => { toast.remove(); }, 4000);
 }
+// 1. Check current session on load
+window.onload = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (session) {
+        showDashboard();
+    } else {
+        document.getElementById('login-overlay').style.display = 'flex';
+    }
+};
+
+// 2. The Login Function
+async function handleLogin() {
+    const email = document.getElementById('auth-email').value;
+    const password = document.getElementById('auth-password').value;
+    const errorMsg = document.getElementById('auth-error');
+
+    const { error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password,
+    });
+
+    if (error) {
+        errorMsg.innerText = error.message;
+    } else {
+        showDashboard();
+    }
+}
+
+// 3. Reveal Dashboard & Start Services
+function showDashboard() {
+    document.getElementById('login-overlay').style.display = 'none';
+    document.getElementById('dashboard-content').style.display = 'block';
+    
+    // Start all your existing services
+    pingServer();
+    loadHistoryFromSupabase();
+    subscribeToTrades();
+}
+
+// 4. Add a Logout Option for safety
+async function handleLogout() {
+    await supabase.auth.signOut();
+    window.location.reload(); // Refresh to lock the app again
+}
