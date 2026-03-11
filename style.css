@@ -147,3 +147,20 @@ header {
 .btn-secondary:hover {
     background: #334155;
 }
+.toast-success {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #10b981; /* Success Green */
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    z-index: 1001;
+    animation: fadeInDown 0.4s ease-out;
+}
+
+@keyframes fadeInDown {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
