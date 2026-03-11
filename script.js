@@ -332,3 +332,77 @@ function exportToCSV() {
     link.click(); // Programmatically click the link to start download
     document.body.removeChild(link); // Clean up
 }
+// Replace these with your actual Supabase credentials
+const SUPABASE_URL = 'https://ecjyjhqotkavtajllxae.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVjanlqaHFvdGthdnRhamxseGFlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2NTAxMzAsImV4cCI6MjA4ODIyNjEzMH0.JTlAsV0NAGK7WyRaech-xvM_xmOawut1G0IKK_E3mpM';
+
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+async function loadHistoryFromSupabase() {
+    const { data, error } = await supabase
+        .from('trades')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        console.error("Error fetching data:", error);
+    } else {
+        tradeLog = data; // Assign the cloud data to our local variable
+        renderHistory();
+    }
+}
+
+// Call this instead of the old localStorage logic
+window.onload = () => {
+    pingServer(); // Your existing wake-up call
+    loadHistoryFromSupabase();
+};
+async function addToHistory(symbol, price) {
+    const { data, error } = await supabase
+        .from('trades')
+        .insert([
+            { symbol: symbol, price: price, action: 'BUY' }
+        ]);
+
+    if (error) {
+        showOnSiteError("Cloud sync failed, but trade was recorded locally.");
+    } else {
+        // Refresh the local view
+        loadHistoryFromSupabase();
+    }
+}
+function subscribeToTrades() {
+    supabase
+        .channel('public:trades') // Create a channel
+        .on('postgres_changes', { 
+            event: 'INSERT', 
+            schema: 'public', 
+            table: 'trades' 
+        }, (payload) => {
+            console.log('New trade detected!', payload.new);
+            
+            // 1. Add the new trade to our local array
+            tradeLog.unshift(payload.new);
+            
+            // 2. Re-render the table instantly
+            renderHistory();
+            
+            // 3. (Optional) Show a success toast
+            showOnSiteSuccess(`Bot just bought ${payload.new.symbol}!`);
+        })
+        .subscribe();
+}
+
+// Update your window.onload to include the subscription
+window.onload = () => {
+    pingServer();
+    loadHistoryFromSupabase();
+    subscribeToTrades(); // <--- Start listening!
+};
+function showOnSiteSuccess(msg) {
+    const toast = document.createElement('div');
+    toast.className = 'toast-success';
+    toast.innerHTML = `<strong>✨ Realtime Update:</strong> ${msg}`;
+    document.body.appendChild(toast);
+
+    setTimeout(() => { toast.remove(); }, 4000);
+}
