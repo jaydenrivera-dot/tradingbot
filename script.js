@@ -474,3 +474,10 @@ async function handleLogout() {
     await supabase.auth.signOut();
     window.location.reload(); // Refresh to lock the app again
 }
+async function handleLogout() {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+        showOnSiteError("Error signing out: " + error.message);
+    }
+    // The onAuthStateChange listener above will handle the UI switch!
+}
