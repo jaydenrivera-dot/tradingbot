@@ -8,6 +8,18 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div id="login-overlay" class="overlay">
+    <div class="auth-card">
+        <h2>🔐 TradeBot Secure Access</h2>
+        <input type="email" id="auth-email" placeholder="Your Email">
+        <input type="password" id="auth-password" placeholder="Password">
+        <button onclick="handleLogin()" class="btn-primary">Login</button>
+        <p id="auth-error" class="error-text"></p>
+    </div>
+</div>
+
+<div id="dashboard-content" style="display: none;">
+    </div>
     <div class="app-container">
         <header>
             <div class="status-wrapper">
