@@ -1,59 +1,39 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TradeBot | Smart Portfolio</title>
-    <link rel="stylesheet" href="style.css">
-</head>
 <body>
     <div id="login-overlay" class="overlay">
-    <div class="auth-card">
-        <h2>🔐 TradeBot Secure Access</h2>
-        <input type="email" id="auth-email" placeholder="Your Email">
-        <input type="password" id="auth-password" placeholder="Password">
-        <button onclick="handleLogin()" class="btn-primary">Login</button>
-        <p id="auth-error" class="error-text"></p>
+        <div class="auth-card">
+            <h2>🔐 TradeBot Secure Access</h2>
+            <input type="email" id="auth-email" placeholder="Your Email">
+            <input type="password" id="auth-password" placeholder="Password">
+            <button onclick="handleLogin()" class="btn-primary">Login</button>
+            <p id="auth-error" class="error-text"></p>
+        </div>
     </div>
-</div>
 
-<div id="dashboard-content" style="display: block;">
-    </div>
-    <div class="app-container">
+    <div id="dashboard-content" style="display: block;">
         <header>
             <div class="status-wrapper">
-    <span id="serverStatus" class="status-dot"></span>
-    <span id="statusText">Checking Connection...</span>
-</div>            <h1>TradeBot <span>Alpha</span></h1>
-            <div class="budget-card">
-                <p>Available Budget</p>
-                <h2 id="balance">$12,450.00</h2>
-                <button onclick="handleLogout()" class="btn-logout">Sign Out</button>
+                <span id="serverStatus" class="status-dot"></span>
+                <span id="statusText">Checking Connection...</span>
             </div>
+            <h1>TradeBot Alpha</h1>
+            <button onclick="handleLogout()" class="btn-logout">Sign Out</button>
         </header>
 
         <main>
-            <section class="market-overview">
-                <h3>Market Watch</h3>
-                <div class="stock-list" id="stockList">
-                    </div>
+            <section class="budget-card">
+                <h3>Available Budget</h3>
+                <p id="budgetText" class="amount">$12,450.00</p>
             </section>
 
-            <section class="bot-control">
+            <section class="trade-actions">
                 <h3>AI Trading Assistant</h3>
-                <div class="bot-card">
-                    <p>Clicking "Auto-Optimize" will scan your trusted sources and execute the most optimal trade based on current trends.</p>
-                    <button id="autoTradeBtn" class="btn-primary">Execute Auto-Trade</button>
-                    <div id="botStatus" class="status-msg"></div>
-                </div>
+                <p>Clicking "Auto-Optimize" will scan your trusted sources...</p>
+                <button id="tradeBtn" onclick="triggerAutoTrade()" class="btn-trade">Execute Auto-Trade</button>
             </section>
-        </main>
+
+            </main>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="script.js"></script>
 </body>
-</html>
-<div class="data-actions">
-    <button onclick="exportToCSV()" class="btn-secondary">📥 Export to CSV</button>
-    <button onclick="clearTradeHistory()" class="btn-outline">Clear History</button>
-</div>
