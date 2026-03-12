@@ -31,3 +31,28 @@ def check_connection():
 
 if __name__ == '__main__':
     app.run(debug=True)
+@app.route('/api/health', methods=['GET'])
+def health_check():
+    # Just a simple response to say "I'm awake!"
+    return jsonify({"status": "awake"}), 200
+from flask import Flask, jsonify, request
+from flask_cors import CORS
+import logging
+
+app = Flask(__name__)
+CORS(app)
+
+@app.route('/api/trade', methods=['POST'])
+def execute_trade():
+    try:
+        # SIMULATION: This is where your Robinhood logic lives
+        # We will manually trigger an error to test the alert
+        raise Exception("Insufficient buying power for this trade.")
+        
+    except Exception as e:
+        # Instead of emailing, we send the error back to the browser
+        return jsonify({
+            "status": "error",
+            "message": str(e),
+            "type": "Critical"
+        }), 500 # 500 tells the browser "something went wrong"
