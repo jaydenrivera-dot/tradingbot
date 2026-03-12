@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: tradebot-backend
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: RH_USERNAME
+        sync: false # You will enter this manually in the dashboard for safety
+      - key: RH_PASSWORD
+        sync: false

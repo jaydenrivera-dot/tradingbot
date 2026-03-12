@@ -1,18 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TradeBot | Smart Portfolio</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div id="login-overlay" class="overlay">
+    <div class="auth-card">
+        <h2>🔐 TradeBot Secure Access</h2>
+        <input type="email" id="auth-email" placeholder="Your Email">
+        <input type="password" id="auth-password" placeholder="Password">
+        <button onclick="handleLogin()" class="btn-primary">Login</button>
+        <p id="auth-error" class="error-text"></p>
+    </div>
+</div>
+
+<div id="dashboard-content" style="display: block;">
+    </div>
     <div class="app-container">
         <header>
-            <h1>TradeBot <span>Alpha</span></h1>
+            <div class="status-wrapper">
+    <span id="serverStatus" class="status-dot"></span>
+    <span id="statusText">Checking Connection...</span>
+</div>            <h1>TradeBot <span>Alpha</span></h1>
             <div class="budget-card">
                 <p>Available Budget</p>
                 <h2 id="balance">$12,450.00</h2>
+                <button onclick="handleLogout()" class="btn-logout">Sign Out</button>
             </div>
         </header>
 
@@ -36,3 +53,7 @@
     <script src="script.js"></script>
 </body>
 </html>
+<div class="data-actions">
+    <button onclick="exportToCSV()" class="btn-secondary">📥 Export to CSV</button>
+    <button onclick="clearTradeHistory()" class="btn-outline">Clear History</button>
+</div>
