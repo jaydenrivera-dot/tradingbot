@@ -7,7 +7,21 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="login-overlay" class="overlay">
+    <div id="robinhood-modal" class="overlay" style="display: none;">
+    <div class="auth-card">
+        <h2>🔗 Connect Robinhood</h2>
+        <p style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 15px;">
+            Enter your Robinhood credentials to link your portfolio.
+        </p>
+        <input type="text" id="rh-username" placeholder="Robinhood Username">
+        <input type="password" id="rh-password" placeholder="Robinhood Password">
+        <div id="mfa-section" style="display: none;">
+            <input type="text" id="rh-mfa" placeholder="6-Digit MFA Code">
+        </div>
+        <button id="connectBtn" onclick="handleRobinhoodConnect()" class="btn-primary">Connect Account</button>
+        <p id="rh-error" class="error-text"></p>
+    </div>
+</div>    <div id="login-overlay" class="overlay">
         <div class="auth-card">
             <h2>🔐 TradeBot Secure Access</h2>
             <input type="email" id="auth-email" placeholder="Email">
