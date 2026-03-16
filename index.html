@@ -1,39 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradeBot Alpha</title>
+    <link rel="stylesheet" href="style.css">
+</head>
 <body>
     <div id="login-overlay" class="overlay">
         <div class="auth-card">
             <h2>🔐 TradeBot Secure Access</h2>
-            <input type="email" id="auth-email" placeholder="Your Email">
+            <input type="email" id="auth-email" placeholder="Email">
             <input type="password" id="auth-password" placeholder="Password">
             <button onclick="handleLogin()" class="btn-primary">Login</button>
             <p id="auth-error" class="error-text"></p>
         </div>
     </div>
 
-    <div id="dashboard-content" style="display: block;">
+    <div id="dashboard-content" style="display: none;">
         <header>
             <div class="status-wrapper">
-                <span id="serverStatus" class="status-dot"></span>
+                <span id="serverStatus" class="status-dot checking"></span>
                 <span id="statusText">Checking Connection...</span>
             </div>
-            <h1>TradeBot Alpha</h1>
             <button onclick="handleLogout()" class="btn-logout">Sign Out</button>
         </header>
 
         <main>
             <section class="budget-card">
                 <h3>Available Budget</h3>
-                <p id="budgetText" class="amount">$12,450.00</p>
+                <p id="budgetText" class="amount">$0.00</p>
+                <span id="profitLabel">--</span>
             </section>
 
-            <section class="trade-actions">
-                <h3>AI Trading Assistant</h3>
-                <p>Clicking "Auto-Optimize" will scan your trusted sources...</p>
-                <button id="tradeBtn" onclick="triggerAutoTrade()" class="btn-trade">Execute Auto-Trade</button>
+            <section class="goal-card">
+                <h3>🎯 Profit Goal</h3>
+                <input type="number" id="targetInput" value="15000" onchange="updateGoalProgress()">
+                <div class="progress-container">
+                    <div id="goalProgressBar" class="progress-bar"></div>
+                </div>
+                <p id="goalStatusText">Set a goal to track progress</p>
             </section>
 
-            </main>
+            <section class="safe-mode-card">
+                <h3>🛡️ Safe Mode</h3>
+                <input type="number" id="userLimitInput" placeholder="Limit % (Max 100)" onchange="validateAndCheckSafety()">
+                <p id="safetyStatus">Monitoring limits...</p>
+                <div id="emergency-zone" style="display: none;">
+                    <button id="emergencySellBtn" onclick="triggerEmergencySell()" class="btn-emergency">🚨 EMERGENCY SELL ALL</button>
+                </div>
+            </section>
+
+            <button id="tradeBtn" onclick="triggerAutoTrade()" class="btn-trade">Execute Auto-Trade</button>
+
+            <table id="historyTable">
+                <thead>
+                    <tr><th>Date</th><th>Symbol</th><th>Action</th><th>Price</th></tr>
+                </thead>
+                <tbody id="historyBody"></tbody>
+            </table>
+        </main>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="script.js"></script>
 </body>
+</html>
