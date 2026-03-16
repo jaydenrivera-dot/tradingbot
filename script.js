@@ -67,3 +67,38 @@ function updateGoalProgress() {
     const percent = Math.min((current / target) * 100, 100);
     document.getElementById('goalProgressBar').style.width = percent + '%';
 }
+async function handleRobinhoodConnect() {
+    const username = document.getElementById('rh-username').value;
+    const password = document.getElementById('rh-password').value;
+    const mfa = document.getElementById('rh-mfa').value;
+    const errorMsg = document.getElementById('rh-error');
+    const connectBtn = document.getElementById('connectBtn');
+
+    connectBtn.innerText = "Connecting...";
+
+    try {
+        const response = await fetch(`${RENDER_URL}/api/connect-rh`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password, mfa })
+        });
+
+        const result = await response.json();
+
+        if (result.status === 'mfa_required') {
+            document.getElementById('mfa-section').style.display = 'block';
+            errorMsg.innerText = "Please enter the MFA code sent to your phone.";
+            connectBtn.innerText = "Verify MFA";
+        } else if (result.status === 'success') {
+            document.getElementById('robinhood-modal').style.display = 'none';
+            alert("Robinhood Connected Successfully!");
+            showDashboard(); // Proceed to the bot
+        } else {
+            errorMsg.innerText = result.message || "Connection failed.";
+            connectBtn.innerText = "Connect Account";
+        }
+    } catch (err) {
+        errorMsg.innerText = "Backend unreachable. Ensure Render is awake.";
+        connectBtn.innerText = "Connect Account";
+    }
+}
