@@ -1,77 +1,65 @@
+// --- CONFIGURATION ---
 const SUPABASE_URL = 'https://ecjyjhqotkavtajllxae.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVjanlqaHFvdGthdnRhamxseGFlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2NTAxMzAsImV4cCI6MjA4ODIyNjEzMH0.JTlAsV0NAGK7WyRaech-xvM_xmOawut1G0IKK_E3mpM';
-const RENDER_URL = 'https://tradebot-backend-4zh2.onrender.com';
+const RENDER_URL = 'https://tradebot-backend-4zh2.onrender.com';const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+let initialPurchaseBalance = 12000.00; // Set your starting point here
 
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-let initialPurchaseBalance = 12000.00; 
-
+// --- INITIALIZATION ---
 window.onload = async () => {
     const { data: { session } } = await supabase.auth.getSession();
-    if (session) showDashboard();
-    else document.getElementById('login-overlay').style.display = 'flex';
+    
+    if (session) {
+        // If user "Remembered" Robinhood, go straight to dashboard
+        if (localStorage.getItem('rh_connected') === 'true') {
+            revealFinalDashboard();
+        } else {
+            showRobinhoodGate(); 
+        }
+    } else {
+        document.getElementById('login-overlay').style.display = 'flex';
+    }
 };
 
+// --- AUTH & NAVIGATION ---
 async function handleLogin() {
     const email = document.getElementById('auth-email').value;
     const password = document.getElementById('auth-password').value;
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) document.getElementById('auth-error').innerText = error.message;
-    else showDashboard();
+    
+    if (error) {
+        document.getElementById('auth-error').innerText = error.message;
+    } else {
+        showRobinhoodGate();
+    }
 }
 
-function showDashboard() {
+function showRobinhoodGate() {
     document.getElementById('login-overlay').style.display = 'none';
+    document.getElementById('robinhood-modal').style.display = 'flex';
+}
+
+function revealFinalDashboard() {
+    document.getElementById('robinhood-modal').style.display = 'none';
     document.getElementById('dashboard-content').style.display = 'block';
+    
+    // Start Services
     pingServer();
     loadHistoryFromSupabase();
     subscribeToTrades();
+    
+    // Heartbeat: Refresh every 60 seconds
+    setInterval(() => {
+        pingServer();
+        loadHistoryFromSupabase();
+    }, 60000);
 }
 
-async function triggerAutoTrade() {
-    try {
-        const res = await fetch(`${RENDER_URL}/api/trade`, { method: 'POST' });
-        if (res.ok) console.log("Trade triggered");
-    } catch (err) { console.error("Trade failed", err); }
-}
-
-function validateAndCheckSafety() {
-    const current = parseFloat(document.getElementById('budgetText').innerText.replace(/[$,]/g, ''));
-    const userLimit = parseFloat(document.getElementById('userLimitInput').value) || 100;
-    const ceiling = initialPurchaseBalance * (1 + Math.min(userLimit, 100) / 100);
-
-    if (current >= ceiling) {
-        document.getElementById('tradeBtn').disabled = true;
-        document.getElementById('tradeBtn').classList.add('btn-disabled');
-        document.getElementById('emergency-zone').style.display = 'block';
-    }
-}
-
-async function loadHistoryFromSupabase() {
-    const { data } = await supabase.from('trades').select('*').order('created_at', { ascending: false });
-    if (data) {
-        renderHistory(data);
-        updatePriceAlert(data[0]?.price || 0); // Example check
-    }
-}
-
-function renderHistory(data) {
-    document.getElementById('historyBody').innerHTML = data.map(t => `
-        <tr><td>${new Date(t.created_at).toLocaleDateString()}</td><td>${t.symbol}</td><td>${t.action}</td><td>$${t.price}</td></tr>
-    `).join('');
-}
-
-// Helper: Sync Goal Bar
-function updateGoalProgress() {
-    const current = parseFloat(document.getElementById('budgetText').innerText.replace(/[$,]/g, '')) || 0;
-    const target = parseFloat(document.getElementById('targetInput').value) || 1;
-    const percent = Math.min((current / target) * 100, 100);
-    document.getElementById('goalProgressBar').style.width = percent + '%';
-}
+// --- ROBINHOOD CONNECTION ---
 async function handleRobinhoodConnect() {
     const username = document.getElementById('rh-username').value;
     const password = document.getElementById('rh-password').value;
     const mfa = document.getElementById('rh-mfa').value;
-    const errorMsg = document.getElementById('rh-error');
+    const remember = document.getElementById('rh-remember').checked;
     const connectBtn = document.getElementById('connectBtn');
 
     connectBtn.innerText = "Connecting...";
@@ -80,25 +68,66 @@ async function handleRobinhoodConnect() {
         const response = await fetch(`${RENDER_URL}/api/connect-rh`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password, mfa })
+            body: JSON.stringify({ username, password, mfa, remember })
         });
 
         const result = await response.json();
 
         if (result.status === 'mfa_required') {
             document.getElementById('mfa-section').style.display = 'block';
-            errorMsg.innerText = "Please enter the MFA code sent to your phone.";
             connectBtn.innerText = "Verify MFA";
         } else if (result.status === 'success') {
-            document.getElementById('robinhood-modal').style.display = 'none';
-            alert("Robinhood Connected Successfully!");
-            showDashboard(); // Proceed to the bot
+            if (remember) localStorage.setItem('rh_connected', 'true');
+            revealFinalDashboard();
         } else {
-            errorMsg.innerText = result.message || "Connection failed.";
+            document.getElementById('rh-error').innerText = result.message || "Failed.";
             connectBtn.innerText = "Connect Account";
         }
     } catch (err) {
-        errorMsg.innerText = "Backend unreachable. Ensure Render is awake.";
-        connectBtn.innerText = "Connect Account";
+        document.getElementById('rh-error').innerText = "Backend Offline.";
+        connectBtn.innerText = "Retry Connection";
     }
+}
+
+// --- RISK & SAFETY LOGIC ---
+function validateAndCheckSafety() {
+    const currentText = document.getElementById('budgetText').innerText;
+    const current = parseFloat(currentText.replace(/[$,]/g, '')) || 0;
+    const userLimit = parseFloat(document.getElementById('userLimitInput').value) || 100;
+    
+    // Ceiling logic: Capped at 100% gain
+    const ceiling = initialPurchaseBalance * (1 + Math.min(userLimit, 100) / 100);
+
+    if (current >= ceiling) {
+        document.getElementById('tradeBtn').disabled = true;
+        document.getElementById('tradeBtn').classList.add('btn-disabled');
+        document.getElementById('emergency-zone').style.display = 'block';
+        document.getElementById('safetyStatus').innerText = "🛑 Profit Target Reached.";
+    } else {
+        document.getElementById('tradeBtn').disabled = false;
+        document.getElementById('tradeBtn').classList.remove('btn-disabled');
+        document.getElementById('emergency-zone').style.display = 'none';
+        document.getElementById('safetyStatus').innerText = "✅ Monitoring limits...";
+    }
+    updateGoalProgress();
+}
+
+// --- UI UPDATES ---
+function updateSyncTimestamp() {
+    const syncElement = document.getElementById('lastSynced');
+    const timeString = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    syncElement.innerText = `Last synced: ${timeString}`;
+    syncElement.style.color = "#10b981"; 
+    setTimeout(() => { syncElement.style.color = "#94a3b8"; }, 1000);
+}
+
+function updateGoalProgress() {
+    const current = parseFloat(document.getElementById('budgetText').innerText.replace(/[$,]/g, '')) || 0;
+    const target = parseFloat(document.getElementById('targetInput').value) || 1;
+    const percent = Math.min((current / target) * 100, 100);
+    
+    const bar = document.getElementById('goalProgressBar');
+    bar.style.width = percent + '%';
+    if (percent >= 100) bar.classList.add('goal-reached');
+    else bar.classList.remove('goal-reached');
 }
