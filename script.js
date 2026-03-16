@@ -1,4 +1,4 @@
-const SUPABASE_URL = 'https://ecjyjhqotkavtajllxae.supabase.co';
+// --- CONFIGURATION ---
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVjanlqaHFvdGthdnRhamxseGFlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2NTAxMzAsImV4cCI6MjA4ODIyNjEzMH0.JTlAsV0NAGK7WyRaech-xvM_xmOawut1G0IKK_E3mpM';
 const RENDER_URL = 'https://tradebot-backend-4zh2.onrender.com';const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let initialPurchaseBalance = 12000.00; // Set your starting point here
