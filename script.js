@@ -131,3 +131,66 @@ function updateGoalProgress() {
     if (percent >= 100) bar.classList.add('goal-reached');
     else bar.classList.remove('goal-reached');
 }
+/**
+ * Toggles the UI between Login and Sign Up modes
+ */
+function toggleAuthMode() {
+    const title = document.getElementById('auth-title');
+    const loginBtn = document.getElementById('loginBtn');
+    const signupBtn = document.getElementById('signupBtn');
+    const toggleLink = document.getElementById('toggle-link');
+    const toggleText = document.getElementById('toggle-text');
+    const errorMsg = document.getElementById('auth-error');
+
+    // Clear any existing errors
+    errorMsg.innerText = "";
+
+    if (loginBtn.style.display === 'none') {
+        // Switch to Login Mode
+        title.innerText = "🔐 TradeBot Access";
+        loginBtn.style.display = 'block';
+        signupBtn.style.display = 'none';
+        toggleText.innerText = "Don't have an account?";
+        toggleLink.innerText = "Sign Up";
+    } else {
+        // Switch to Sign Up Mode
+        title.innerText = "🚀 Create Your Account";
+        loginBtn.style.display = 'none';
+        signupBtn.style.display = 'block';
+        toggleText.innerText = "Already have an account?";
+        toggleLink.innerText = "Login";
+    }
+}
+
+/**
+ * Handles account creation via Supabase
+ */
+async function handleSignUp() {
+    const email = document.getElementById('auth-email').value;
+    const password = document.getElementById('auth-password').value;
+    const errorMsg = document.getElementById('auth-error');
+    const signupBtn = document.getElementById('signupBtn');
+
+    if (!email || !password) {
+        errorMsg.innerText = "Please fill in both fields.";
+        return;
+    }
+
+    signupBtn.innerText = "Creating...";
+    signupBtn.disabled = true;
+
+    const { data, error } = await supabase.auth.signUp({
+        email: email,
+        password: password,
+    });
+
+    if (error) {
+        errorMsg.innerText = error.message;
+        signupBtn.innerText = "Create Account";
+        signupBtn.disabled = false;
+    } else {
+        // By default, Supabase sends a confirmation email
+        alert("Success! Please check your email inbox to confirm your account before logging in.");
+        toggleAuthMode(); // Switch back to login view for them
+    }
+}
