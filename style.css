@@ -197,3 +197,50 @@ th, td {
 }
 
 th { background: #2d3748; color: var(--text-dim); font-size: 0.8rem; }
+/* --- New Authentication Features --- */
+
+/* Sign Up Button (Secondary style) */
+.btn-secondary {
+    background: transparent;
+    color: var(--accent-blue);
+    border: 1px solid var(--accent-blue);
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 5px;
+    transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+    background: rgba(59, 130, 246, 0.1);
+}
+
+/* Password Recovery Link */
+.forgot-link {
+    display: block;
+    text-align: right;
+    margin-top: -5px;
+    margin-bottom: 15px;
+    color: var(--text-dim);
+    font-size: 0.75rem;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.forgot-link:hover {
+    color: var(--accent-blue);
+    text-decoration: underline;
+}
+
+/* Mode Toggle Link Styling */
+#toggle-link {
+    color: var(--accent-blue);
+    text-decoration: none;
+    font-weight: bold;
+}
+
+#toggle-link:hover {
+    text-decoration: underline;
+}
