@@ -56,3 +56,29 @@ def execute_trade():
             "message": str(e),
             "type": "Critical"
         }), 500 # 500 tells the browser "something went wrong"
+import robin_stocks.robinhood as rh
+from flask import Flask, request, jsonify
+
+@app.route('/api/connect-rh', methods=['POST'])
+def connect_robinhood():
+    data = request.json
+    username = data.get('username')
+    password = data.get('password')
+    mfa_code = data.get('mfa')
+
+    try:
+        # If mfa_code is provided, try logging in with it
+        if mfa_code:
+            login = rh.login(username, password, mfa_code=mfa_code)
+        else:
+            login = rh.login(username, password)
+
+        # Check if Robinhood is asking for MFA
+        if login.get('detail') == 'mfa_required' or 'mfa_code' in str(login):
+            return jsonify({"status": "mfa_required"}), 200
+
+        # Success!
+        return jsonify({"status": "success", "message": "Logged in"}), 200
+
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 400
