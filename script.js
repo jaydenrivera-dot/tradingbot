@@ -338,3 +338,11 @@ async function handleSignUp() {
         toggleAuthMode();
     }
 }
+function validateEmailOnBlur() {
+    const emailInput = document.getElementById('auth-email');
+    if (emailInput.value && !isValidEmail(emailInput.value)) {
+        emailInput.style.borderColor = "#ef4444";
+    } else {
+        emailInput.style.borderColor = "#334155";
+    }
+}
