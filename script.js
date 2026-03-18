@@ -195,6 +195,23 @@ async function handleSignUp() {
 }
 // 1. Function to switch between "Login" and "Sign Up" screens
 function toggleAuthMode() {
+    // --- START PRO-TIP ADDITION ---
+    // 1. Reset the password field to 'hidden' (dots)
+    const passwordInput = document.getElementById('auth-password');
+    passwordInput.type = 'password';
+    
+    // 2. Reset the eye icon to the default state
+    const eyeIcon = document.getElementById('eye-icon');
+    if (eyeIcon) eyeIcon.innerText = '👁️';
+
+    // 3. Clear and hide the strength meter immediately
+    const strengthBar = document.getElementById('strength-bar');
+    if (strengthBar) strengthBar.style.width = '0%';
+    
+    const strengthMeter = document.getElementById('strength-meter-container');
+    if (strengthMeter) strengthMeter.style.display = 'none';
+    // --- END PRO-TIP ADDITION ---
+
     const title = document.getElementById('auth-title');
     const loginBtn = document.getElementById('loginBtn');
     const signupBtn = document.getElementById('signupBtn');
@@ -202,14 +219,12 @@ function toggleAuthMode() {
     const toggleText = document.getElementById('toggle-text');
 
     if (loginBtn.style.display === 'none') {
-        // Switch back to LOGIN
         title.innerText = "🔐 TradeBot Access";
         loginBtn.style.display = 'block';
         signupBtn.style.display = 'none';
         toggleText.innerText = "Don't have an account?";
         toggleLink.innerText = "Sign Up";
     } else {
-        // Switch to SIGN UP
         title.innerText = "🚀 Create Your Account";
         loginBtn.style.display = 'none';
         signupBtn.style.display = 'block';
@@ -234,5 +249,48 @@ async function handleSignUp() {
     } else {
         alert("Success! Please check your email inbox to confirm your account before logging in.");
         toggleAuthMode(); // Send them back to the login screen
+    }
+}
+// 1. Toggle View/Un-view Password
+function togglePasswordVisibility() {
+    const passwordInput = document.getElementById('auth-password');
+    const eyeIcon = document.getElementById('eye-icon');
+
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        eyeIcon.innerText = '🙈'; // Icon for "Hide"
+    } else {
+        passwordInput.type = 'password';
+        eyeIcon.innerText = '👁️'; // Icon for "View"
+    }
+}
+
+// 2. Password Strength Meter Logic
+function checkPasswordStrength() {
+    const password = document.getElementById('auth-password').value;
+    const bar = document.getElementById('strength-bar');
+    const text = document.getElementById('strength-text');
+    
+    // Only show meter if we are in Sign Up mode
+    const signupBtn = document.getElementById('signupBtn');
+    document.getElementById('strength-meter-container').style.display = signupBtn.style.display === 'block' ? 'block' : 'none';
+
+    let strength = 0;
+    if (password.length > 7) strength += 25;
+    if (/[A-Z]/.test(password)) strength += 25;
+    if (/[0-9]/.test(password)) strength += 25;
+    if (/[^A-Za-z0-9]/.test(password)) strength += 25;
+
+    bar.style.width = strength + '%';
+
+    if (strength <= 25) {
+        bar.style.backgroundColor = "#ef4444"; // Red
+        text.innerText = "Weak (Needs numbers/caps)";
+    } else if (strength <= 75) {
+        bar.style.backgroundColor = "#f59e0b"; // Amber
+        text.innerText = "Good";
+    } else {
+        bar.style.backgroundColor = "#10b981"; // Green
+        text.innerText = "Strong Password";
     }
 }
