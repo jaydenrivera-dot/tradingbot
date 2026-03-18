@@ -481,3 +481,12 @@ async function handleLogout() {
     }
     // The onAuthStateChange listener above will handle the UI switch!
 }
+function revealFinalDashboard() {
+    // This line is CRITICAL to seeing your stocks again
+    document.getElementById('dashboard-content').style.display = 'block';
+    document.getElementById('login-overlay').style.display = 'none';
+    
+    // Call your data fetching functions
+    pingServer();
+    loadHistoryFromSupabase(); 
+}
