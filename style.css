@@ -283,3 +283,18 @@ th { background: #2d3748; color: var(--text-dim); font-size: 0.8rem; }
 #auth-password {
     padding-right: 45px !important;
 }
+.error-text {
+    min-height: 1.2rem;
+    transition: all 0.3s ease;
+    animation: shake 0.4s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+#auth-email {
+    transition: border-color 0.3s ease;
+}
