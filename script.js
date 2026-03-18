@@ -359,3 +359,31 @@ function validateEmailOnBlur() {
         emailInput.style.borderColor = "#334155";
     }
 }
+// 1. Toggle Password Visibility
+function togglePasswordVisibility() {
+    const passwordInput = document.getElementById('auth-password');
+    const eyeIcon = document.getElementById('eye-icon');
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        eyeIcon.innerText = '🙈';
+    } else {
+        passwordInput.type = 'password';
+        eyeIcon.innerText = '👁️';
+    }
+}
+
+// 2. Validate Email Format
+function isValidEmail(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+}
+
+// 3. Visual Border Feedback for Email
+function validateEmailOnBlur() {
+    const emailInput = document.getElementById('auth-email');
+    if (emailInput.value && !isValidEmail(emailInput.value)) {
+        emailInput.style.borderColor = "#ef4444";
+    } else {
+        emailInput.style.borderColor = "#334155";
+    }
+}
