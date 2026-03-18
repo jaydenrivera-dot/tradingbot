@@ -387,3 +387,19 @@ function validateEmailOnBlur() {
         emailInput.style.borderColor = "#334155";
     }
 }
+window.onload = async () => {
+    // 1. Check if Supabase has a logged-in user
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (session) {
+        // 2. If logged in, check if Robinhood is also connected
+        if (localStorage.getItem('rh_connected') === 'true') {
+            revealFinalDashboard(); // This shows the stocks and trade buttons
+        } else {
+            showRobinhoodGate(); // Shows the connect modal
+        }
+    } else {
+        // 3. If no user, stay on the Login Overlay
+        document.getElementById('login-overlay').style.display = 'flex';
+    }
+};
