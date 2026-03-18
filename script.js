@@ -193,3 +193,46 @@ async function handleSignUp() {
         toggleAuthMode(); // Switch back to login view for them
     }
 }
+// 1. Function to switch between "Login" and "Sign Up" screens
+function toggleAuthMode() {
+    const title = document.getElementById('auth-title');
+    const loginBtn = document.getElementById('loginBtn');
+    const signupBtn = document.getElementById('signupBtn');
+    const toggleLink = document.getElementById('toggle-link');
+    const toggleText = document.getElementById('toggle-text');
+
+    if (loginBtn.style.display === 'none') {
+        // Switch back to LOGIN
+        title.innerText = "🔐 TradeBot Access";
+        loginBtn.style.display = 'block';
+        signupBtn.style.display = 'none';
+        toggleText.innerText = "Don't have an account?";
+        toggleLink.innerText = "Sign Up";
+    } else {
+        // Switch to SIGN UP
+        title.innerText = "🚀 Create Your Account";
+        loginBtn.style.display = 'none';
+        signupBtn.style.display = 'block';
+        toggleText.innerText = "Already have an account?";
+        toggleLink.innerText = "Login";
+    }
+}
+
+// 2. Function to register the user in Supabase
+async function handleSignUp() {
+    const email = document.getElementById('auth-email').value;
+    const password = document.getElementById('auth-password').value;
+    const errorMsg = document.getElementById('auth-error');
+
+    const { data, error } = await supabase.auth.signUp({
+        email: email,
+        password: password,
+    });
+
+    if (error) {
+        errorMsg.innerText = error.message;
+    } else {
+        alert("Success! Please check your email inbox to confirm your account before logging in.");
+        toggleAuthMode(); // Send them back to the login screen
+    }
+}
