@@ -1,7 +1,7 @@
 // --- 1. CONFIGURATION ---
 // Replace the URL below with your actual Supabase Project URL from your dashboard
-const SUPABASE_URL = 'https://ecjyjhqotkavtajllxae.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVjanlqaHFvdGthdnRhamxseGFlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2NTAxMzAsImV4cCI6MjA4ODIyNjEzMH0.JTlAsV0NAGK7WyRaech-xvM_xmOawut1G0IKK_E3mpM';
+const SUPABASE_URL = 'https://jkoyveivgkmogrddtoys.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_os93_0r6FEETugSQtnPuuQ_n3dsiLWh';
 const RENDER_URL = 'https://tradebot-backend-4zh2.onrender.com';
 
 const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
