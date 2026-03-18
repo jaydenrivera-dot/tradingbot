@@ -294,3 +294,47 @@ function checkPasswordStrength() {
         text.innerText = "Strong Password";
     }
 }
+// 1. Email Format Validator
+function isValidEmail(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+}
+
+// 2. Updated Handle Sign Up
+async function handleSignUp() {
+    const email = document.getElementById('auth-email').value;
+    const password = document.getElementById('auth-password').value;
+    const errorMsg = document.getElementById('auth-error');
+    const emailInput = document.getElementById('auth-email');
+
+    // Reset styles
+    errorMsg.innerHTML = "";
+    emailInput.style.borderColor = "#334155";
+
+    // Client-side Validation
+    if (!isValidEmail(email)) {
+        errorMsg.innerText = "Please enter a valid email address (e.g., name@gmail.com).";
+        emailInput.style.borderColor = "#ef4444"; // Highlight red
+        return;
+    }
+
+    if (password.length < 6) {
+        errorMsg.innerText = "Password must be at least 6 characters.";
+        return;
+    }
+
+    // Supabase Attempt
+    const { data, error } = await supabase.auth.signUp({ email, password });
+
+    if (error) {
+        // Catch "User already registered" error
+        if (error.message.includes("already registered") || error.status === 422) {
+            errorMsg.innerHTML = `Account already exists. <a href="#" onclick="toggleAuthMode()" style="color: #3b82f6; text-decoration: underline;">Click here to Login instead.</a>`;
+        } else {
+            errorMsg.innerText = error.message;
+        }
+    } else {
+        alert("Success! Check your email for a confirmation link.");
+        toggleAuthMode();
+    }
+}
