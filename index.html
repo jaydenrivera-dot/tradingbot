@@ -59,7 +59,7 @@
             <button onclick="handleLogout()" class="btn-logout">Sign Out</button>
             <div class="password-wrapper" style="position: relative; margin: 10px 0;">
     <input type="password" id="auth-password" placeholder="Password" oninput="checkPasswordStrength()" style="padding-right: 40px;">
-    
+    <input type="email" id="auth-email" placeholder="Email" onblur="validateEmailOnBlur()">
     <button type="button" onclick="togglePasswordVisibility()" class="toggle-password-btn">
         <span id="eye-icon">👁️</span>
     </button>
