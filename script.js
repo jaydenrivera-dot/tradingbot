@@ -140,24 +140,37 @@ function toggleAuthMode() {
     const toggleLink = document.getElementById('toggle-link');
     const toggleText = document.getElementById('toggle-text');
     const errorMsg = document.getElementById('auth-error');
+    
+    // --- UI CLEANUP LOGIC ---
+    // 1. Reset password visibility to 'hidden'
+    const passwordInput = document.getElementById('auth-password');
+    passwordInput.type = 'password';
+    document.getElementById('eye-icon').innerText = '👁️';
 
-    // Clear any existing errors
-    errorMsg.innerText = "";
+    // 2. Clear any error messages
+    errorMsg.innerHTML = "";
+    document.getElementById('auth-email').style.borderColor = "#334155";
 
+    // 3. Hide the Strength Meter (it should only show during Sign Up)
+    const strengthMeter = document.getElementById('strength-meter-container');
+    
+    // --- TOGGLE LOGIC ---
     if (loginBtn.style.display === 'none') {
-        // Switch to Login Mode
+        // Switching to LOGIN MODE
         title.innerText = "🔐 TradeBot Access";
         loginBtn.style.display = 'block';
         signupBtn.style.display = 'none';
         toggleText.innerText = "Don't have an account?";
         toggleLink.innerText = "Sign Up";
+        strengthMeter.style.display = 'none'; // Ensure meter is hidden
     } else {
-        // Switch to Sign Up Mode
+        // Switching to SIGN UP MODE
         title.innerText = "🚀 Create Your Account";
         loginBtn.style.display = 'none';
         signupBtn.style.display = 'block';
         toggleText.innerText = "Already have an account?";
         toggleLink.innerText = "Login";
+        // Meter will be shown by checkPasswordStrength() as the user types
     }
 }
 
