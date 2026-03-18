@@ -57,6 +57,20 @@
                 <span id="lastSynced"></span>
             </div>
             <button onclick="handleLogout()" class="btn-logout">Sign Out</button>
+            <div class="password-wrapper" style="position: relative; margin: 10px 0;">
+    <input type="password" id="auth-password" placeholder="Password" oninput="checkPasswordStrength()" style="padding-right: 40px;">
+    
+    <button type="button" onclick="togglePasswordVisibility()" class="toggle-password-btn">
+        <span id="eye-icon">👁️</span>
+    </button>
+
+    <div id="strength-meter-container" style="display: none; margin-top: 5px; text-align: left;">
+        <div style="height: 4px; background: #334155; border-radius: 2px; overflow: hidden;">
+            <div id="strength-bar" style="height: 100%; width: 0%; transition: width 0.3s, background 0.3s;"></div>
+        </div>
+        <span id="strength-text" style="font-size: 0.7rem; color: #94a3b8;">Password Strength</span>
+    </div>
+</div>
         </header>
 
         <main>
