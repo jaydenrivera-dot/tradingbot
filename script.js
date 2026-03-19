@@ -8,7 +8,7 @@ console.log("🚀 script.js has successfully bypassed the naming conflict!");
 
 window.onload = async () => {
  
-    const { data: { session } } = await myBotDB.auth.getSession();
+    const { data: { session } } = await dbClient.auth.getSession();
     
     if (session) {
         if (localStorage.getItem('rh_connected') === 'true') {
@@ -26,7 +26,7 @@ async function handleLogin() {
     const password = document.getElementById('auth-password').value;
     const errorMsg = document.getElementById('auth-error');
 
-    const { error } = await myBotDB.auth.signInWithPassword({ email, password });
+    const { error } = await dbClient.auth.signInWithPassword({ email, password });
     
     if (error) {
         errorMsg.innerText = error.message;
@@ -147,7 +147,7 @@ function checkPasswordStrength() {
     const text = document.getElementById('strength-text');
     const signupBtn = document.getElementById('signupBtn');
 
-    if (signupBtn.style.display !== 'block') return; // Only show for Sign Up
+    if (signupBtn.style.display !== 'block') return; 
     
     document.getElementById('strength-meter-container').style.display = 'block';
     let strength = 0;
