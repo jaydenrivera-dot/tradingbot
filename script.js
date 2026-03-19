@@ -1,17 +1,13 @@
-// --- 1. CONFIGURATION ---
-// Replace the URL below with your actual Supabase Project URL from your dashboard
 const SUPABASE_URL = 'https://ecjyjhqotkavtajllxae.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVjanlqaHFvdGthdnRhamxseGFlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2NTAxMzAsImV4cCI6MjA4ODIyNjEzMH0.JTlAsV0NAGK7WyRaech-xvM_xmOawut1G0IKK_E3mpM';
 const RENDER_URL = 'https://tradebot-backend-4zh2.onrender.com';
-// --- 1. CONFIGURATION ---
-// We are using 'myBotDB' to make sure it doesn't conflict with anything else
+
 const myBotDB = supabase.createClient('https://ecjyjhqotkavtajllxae.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVjanlqaHFvdGthdnRhamxseGFlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2NTAxMzAsImV4cCI6MjA4ODIyNjEzMH0.JTlAsV0NAGK7WyRaech-xvM_xmOawut1G0IKK_E3mpM');
 
-console.log("🚀 Script loaded successfully!"); // This will prove the file updated
+console.log("🚀 Script loaded successfully!"); 
 
-// --- 2. INITIALIZATION ---
 window.onload = async () => {
-    // Note: We use 'myBotDB' now
+ 
     const { data: { session } } = await myBotDB.auth.getSession();
     
     if (session) {
@@ -24,7 +20,6 @@ window.onload = async () => {
         document.getElementById('login-overlay').style.display = 'flex';
     }
 };
-// --- 3. AUTHENTICATION LOGIC ---
 
 async function handleLogin() {
     const email = document.getElementById('auth-email').value;
@@ -49,7 +44,7 @@ async function handleSignUp() {
     errorMsg.innerHTML = "";
     emailInput.style.borderColor = "#334155";
 
-    // Validation
+ 
     if (!isValidEmail(email)) {
         errorMsg.innerText = "Please enter a valid email address.";
         emailInput.style.borderColor = "#ef4444";
@@ -76,12 +71,11 @@ async function handleSignUp() {
 }
 
 function handleLogout() {
-    supabase.auth.signOut();
+    myBotDB.auth.signOut(); 
     localStorage.removeItem('rh_connected');
     location.reload();
 }
 
-// --- 4. NAVIGATION & UI TOGGLES ---
 
 function showRobinhoodGate() {
     document.getElementById('login-overlay').style.display = 'none';
@@ -93,11 +87,9 @@ function revealFinalDashboard() {
     document.getElementById('robinhood-modal').style.display = 'none';
     document.getElementById('dashboard-content').style.display = 'block';
     
-    // Start Background Services
     pingServer();
     loadHistoryFromSupabase();
     
-    // Refresh loop every 60s
     setInterval(() => {
         pingServer();
         loadHistoryFromSupabase();
@@ -105,24 +97,19 @@ function revealFinalDashboard() {
 }
 
 function toggleAuthMode() {
-    function toggleAuthMode() {
-    console.log("Toggle function was clicked!"); // This will show up in your Console
+    console.log("Toggle function was clicked!"); 
     
-    const title = document.getElementById('auth-title');
-    // ... the rest of your code
     const title = document.getElementById('auth-title');
     const loginBtn = document.getElementById('loginBtn');
     const signupBtn = document.getElementById('signupBtn');
     const toggleLink = document.getElementById('toggle-link');
     const toggleText = document.getElementById('toggle-text');
-    const authCard = document.querySelector('.auth-card'); // Select the card
+    const authCard = document.querySelector('.auth-card'); 
    
-    // --- TRIGGER ANIMATION ---
-    authCard.classList.remove('fade-in'); // Remove first
-    void authCard.offsetWidth;            // "Magic" line to reset the animation
-    authCard.classList.add('fade-in');    // Re-add to play it again
+    authCard.classList.remove('fade-in'); 
+    void authCard.offsetWidth;            
+    authCard.classList.add('fade-in');    
     
-    // Reset inputs
     document.getElementById('auth-password').type = 'password';
     document.getElementById('eye-icon').innerText = '👁️';
     document.getElementById('strength-meter-container').style.display = 'none';
@@ -141,8 +128,6 @@ function toggleAuthMode() {
         toggleLink.innerText = "Login";
     }
 }
-
-// --- 5. SECURITY & UTILS ---
 
 function togglePasswordVisibility() {
     const passwordInput = document.getElementById('auth-password');
@@ -185,7 +170,6 @@ function validateEmailOnBlur() {
     emailInput.style.borderColor = (emailInput.value && !isValidEmail(emailInput.value)) ? "#ef4444" : "#334155";
 }
 
-// --- 6. ROBINHOOD & TRADING ---
 
 async function handleRobinhoodConnect() {
     const username = document.getElementById('rh-username').value;
@@ -236,22 +220,18 @@ function validateAndCheckSafety() {
         document.getElementById('safetyStatus').innerText = "✅ Monitoring limits...";
     }
 }
-/**
- * Handles the "Create Account" process using Supabase Auth
- */
+
 async function handleSignUp() {
-    // 1. Grab values from the input fields
+
     const email = document.getElementById('auth-email').value;
     const password = document.getElementById('auth-password').value;
     const errorMsg = document.getElementById('auth-error');
     const signupBtn = document.getElementById('signupBtn');
 
-    // 2. Clear previous errors and show "Loading" state
     errorMsg.innerHTML = "";
     signupBtn.innerText = "Creating Account...";
     signupBtn.disabled = true;
 
-    // 3. Basic Validation
     if (!isValidEmail(email)) {
         errorMsg.innerText = "Please enter a valid email address.";
         signupBtn.innerText = "Create Account";
@@ -267,15 +247,12 @@ async function handleSignUp() {
     }
 
     try {
-        // 4. Call Supabase to create the user
-        // Note: We use '_supabase' to avoid the naming conflict error
         const { data, error } = await myBotDB.auth.signUp({
             email: email,
             password: password,
         });
 
         if (error) {
-            // Check if the user already exists
             if (error.message.includes("already registered") || error.status === 422) {
                 errorMsg.innerHTML = `Account already exists. <a href="#" onclick="toggleAuthMode()" style="color: #3b82f6; text-decoration: underline; cursor: pointer;">Login instead.</a>`;
             } else {
@@ -284,9 +261,8 @@ async function handleSignUp() {
             signupBtn.innerText = "Create Account";
             signupBtn.disabled = false;
         } else {
-            // 5. Success! Prompt for email confirmation
             alert("Success! Please check your email inbox to confirm your account before logging in.");
-            toggleAuthMode(); // Switches the UI back to the Login screen
+            toggleAuthMode(); 
         }
     } catch (err) {
         errorMsg.innerText = "An unexpected error occurred. Please try again.";
