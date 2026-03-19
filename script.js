@@ -61,7 +61,7 @@ async function handleSignUp() {
         return;
     }
 
-    const { data, error } = await supabase.auth.signUp({ email, password });
+    const { data, error } = await _supabase.auth.signUp({ email, password });
 
     if (error) {
         if (error.message.includes("already registered") || error.status === 422) {
