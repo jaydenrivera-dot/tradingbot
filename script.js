@@ -225,3 +225,30 @@ function validateAndCheckSafety() {
         document.getElementById('safetyStatus').innerText = "✅ Monitoring limits...";
     }
 }
+async function fetchLivePrice(symbol) {
+    try {
+        // 1. Ask your Render backend for the secure data
+        const response = await fetch(`${RENDER_URL}/api/quote/${symbol}`);
+        const data = await response.json();
+
+        // 2. Finnhub returns the current price as 'c'
+        if (data.c) {
+            console.log(`Live price for ${symbol}: $${data.c}`);
+            
+            // If you have a spot in your HTML for it, update it here!
+            // document.getElementById('market-price').innerText = `$${data.c}`;
+        } else {
+            console.error("Could not find price data for that symbol.");
+        }
+    } catch (error) {
+        console.error("Failed to connect to backend:", error);
+    }
+}
+function startDashboardServices() {
+    pingServer();
+    
+    // Fetch the live price of the S&P 500 (SPY) when the dashboard loads
+    fetchLivePrice('SPY'); 
+    
+    console.log("Monitoring Market Activity...");
+}
