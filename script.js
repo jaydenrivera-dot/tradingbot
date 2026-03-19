@@ -270,3 +270,43 @@ async function handleSignUp() {
         signupBtn.disabled = false;
     }
 }
+// This 'DOMContentLoaded' wrapper ensures the button exists before we try to click it
+document.addEventListener('DOMContentLoaded', () => {
+    const toggleBtn = document.getElementById('toggle-auth-btn');
+
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', function(event) {
+            // 1. Prevent the page from refreshing or adding '#' to the URL
+            event.preventDefault(); 
+
+            // 2. Identify the elements we need to change
+            const title = document.getElementById('auth-title');
+            const loginBtn = document.getElementById('loginBtn');
+            const signupBtn = document.getElementById('signupBtn');
+            const toggleText = document.getElementById('toggle-text');
+            const authCard = document.querySelector('.auth-card');
+
+            // 3. Add a quick animation reset
+            authCard.style.animation = 'none';
+            authCard.offsetHeight; // trigger reflow
+            authCard.style.animation = null; 
+
+            // 4. Logic to switch between Login and Sign Up views
+            if (loginBtn.style.display !== 'none') {
+                // Switch to SIGN UP view
+                title.innerText = "🚀 Create Your Account";
+                loginBtn.style.display = 'none';
+                signupBtn.style.display = 'block';
+                toggleText.innerText = "Already have an account?";
+                this.innerText = "Login"; // 'this' refers to the toggle button
+            } else {
+                // Switch back to LOGIN view
+                title.innerText = "🔐 TradeBot Access";
+                loginBtn.style.display = 'block';
+                signupBtn.style.display = 'none';
+                toggleText.innerText = "Don't have an account?";
+                this.innerText = "Sign Up";
+            }
+        });
+    }
+});
