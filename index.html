@@ -1,39 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradeBot Alpha | Secure Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
 <body>
-    <div id="login-overlay" class="overlay">
+
+    <div id="robinhood-modal" class="overlay" style="display: none;">
         <div class="auth-card">
-            <h2>🔐 TradeBot Secure Access</h2>
-            <input type="email" id="auth-email" placeholder="Your Email">
-            <input type="password" id="auth-password" placeholder="Password">
-            <button onclick="handleLogin()" class="btn-primary">Login</button>
-            <p id="auth-error" class="error-text"></p>
+            <h2>🔗 Connect Robinhood</h2>
+            <p style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 15px;">Link your portfolio to enable trading.</p>
+            
+            <input type="text" id="rh-username" placeholder="Robinhood Username">
+            <input type="password" id="rh-password" placeholder="Robinhood Password">
+            
+            <div id="mfa-section" style="display: none;">
+                <input type="text" id="rh-mfa" placeholder="6-Digit MFA Code">
+            </div>
+
+            <div class="remember-me-wrapper" style="margin: 10px 0; text-align: left; font-size: 0.8rem; color: #94a3b8;">
+                <input type="checkbox" id="rh-remember" style="width: auto; margin-right: 5px;">
+                <label for="rh-remember">Stay connected</label>
+            </div>
+
+            <button id="connectBtn" onclick="handleRobinhoodConnect()" class="btn-primary">Connect Account</button>
+            <p id="rh-error" class="error-text"></p>
         </div>
     </div>
 
     <div id="dashboard-content" style="display: block;">
         <header>
             <div class="status-wrapper">
-                <span id="serverStatus" class="status-dot"></span>
-                <span id="statusText">Checking Connection...</span>
+                <span id="serverStatus" class="status-dot checking"></span>
+                <span id="statusText">Connecting...</span>
+                <span id="lastSynced"></span>
             </div>
-            <h1>TradeBot Alpha</h1>
             <button onclick="handleLogout()" class="btn-logout">Sign Out</button>
         </header>
 
         <main>
             <section class="budget-card">
                 <h3>Available Budget</h3>
-                <p id="budgetText" class="amount">$12,450.00</p>
+                <p id="budgetText" class="amount">$0.00</p>
+                <span id="profitLabel" class="neutral">--</span>
             </section>
 
-            <section class="trade-actions">
-                <h3>AI Trading Assistant</h3>
-                <p>Clicking "Auto-Optimize" will scan your trusted sources...</p>
-                <button id="tradeBtn" onclick="triggerAutoTrade()" class="btn-trade">Execute Auto-Trade</button>
+            <section class="safe-mode-card">
+                <h3>🛡️ Safe Mode</h3>
+                <label style="font-size: 0.7rem; color: #94a3b8;">PROFIT CEILING (%)</label>
+                <input type="number" id="userLimitInput" value="100" onchange="validateAndCheckSafety()">
+                <p id="safetyStatus">Monitoring limits...</p>
+                
+                <div id="emergency-zone" style="display: none; margin-top: 15px;">
+                    <button id="emergencySellBtn" onclick="triggerEmergencySell()" class="btn-emergency">🚨 EMERGENCY SELL ALL</button>
+                </div>
             </section>
 
-            </main>
+            <button id="tradeBtn" onclick="triggerAutoTrade()" class="btn-trade">Execute Auto-Trade</button>
+
+            <table id="historyTable">
+                <thead>
+                    <tr><th>Date</th><th>Symbol</th><th>Action</th><th>Price</th></tr>
+                </thead>
+                <tbody id="historyBody"></tbody>
+            </table>
+
+            <section class="log-card" style="margin-top: 2rem; opacity: 0.8; font-size: 0.8rem;">
+                <h4 style="color: #94a3b8;">🛡️ System Health Logs</h4>
+                <div id="errorLogBody" style="background: #0f172a; padding: 10px; border-radius: 5px; height: 80px; overflow-y: auto; color: #10b981; font-family: monospace;">
+                    [INFO] System initialized. Ready.
+                </div>
+            </section>
+        </main>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="script.js"></script>
 </body>
+</html>
