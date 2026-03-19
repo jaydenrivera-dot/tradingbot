@@ -110,6 +110,12 @@ function toggleAuthMode() {
     const signupBtn = document.getElementById('signupBtn');
     const toggleLink = document.getElementById('toggle-link');
     const toggleText = document.getElementById('toggle-text');
+    const authCard = document.querySelector('.auth-card'); // Select the card
+   
+    // --- TRIGGER ANIMATION ---
+    authCard.classList.remove('fade-in'); // Remove first
+    void authCard.offsetWidth;            // "Magic" line to reset the animation
+    authCard.classList.add('fade-in');    // Re-add to play it again
     
     // Reset inputs
     document.getElementById('auth-password').type = 'password';
