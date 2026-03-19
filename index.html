@@ -56,6 +56,9 @@
                 <span id="statusText">Connecting...</span>
                 <span id="lastSynced"></span>
             </div>
+            <button id="signupBtn" onclick="handleSignUp()" class="btn-secondary" style="display: none;">
+    Create Account
+</button>
             <button onclick="handleLogout()" class="btn-logout">Sign Out</button>
             <div class="password-wrapper" style="position: relative; margin: 10px 0;">
     <input type="password" id="auth-password" placeholder="Password" oninput="checkPasswordStrength()" style="padding-right: 40px;">
