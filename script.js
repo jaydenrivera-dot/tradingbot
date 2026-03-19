@@ -3,27 +3,27 @@
 const SUPABASE_URL = 'https://ecjyjhqotkavtajllxae.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVjanlqaHFvdGthdnRhamxseGFlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2NTAxMzAsImV4cCI6MjA4ODIyNjEzMH0.JTlAsV0NAGK7WyRaech-xvM_xmOawut1G0IKK_E3mpM';
 const RENDER_URL = 'https://tradebot-backend-4zh2.onrender.com';
+// --- 1. CONFIGURATION ---
+// We are using 'myBotDB' to make sure it doesn't conflict with anything else
+const myBotDB = supabase.createClient('https://ecjyjhqotkavtajllxae.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVjanlqaHFvdGthdnRhamxseGFlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2NTAxMzAsImV4cCI6MjA4ODIyNjEzMH0.JTlAsV0NAGK7WyRaech-xvM_xmOawut1G0IKK_E3mpM');
 
-const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-let initialPurchaseBalance = 12000.00; 
+console.log("🚀 Script loaded successfully!"); // This will prove the file updated
 
-// --- 2. INITIALIZATION (The "Gatekeeper") ---
+// --- 2. INITIALIZATION ---
 window.onload = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
+    // Note: We use 'myBotDB' now
+    const { data: { session } } = await myBotDB.auth.getSession();
     
     if (session) {
-        // If logged into Supabase, check if Robinhood is also connected
         if (localStorage.getItem('rh_connected') === 'true') {
             revealFinalDashboard();
         } else {
             showRobinhoodGate(); 
         }
     } else {
-        // Force the login screen if no session exists
         document.getElementById('login-overlay').style.display = 'flex';
     }
 };
-
 // --- 3. AUTHENTICATION LOGIC ---
 
 async function handleLogin() {
@@ -31,7 +31,7 @@ async function handleLogin() {
     const password = document.getElementById('auth-password').value;
     const errorMsg = document.getElementById('auth-error');
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await myBotDB.auth.signInWithPassword({ email, password });
     
     if (error) {
         errorMsg.innerText = error.message;
@@ -61,7 +61,7 @@ async function handleSignUp() {
         return;
     }
 
-    const { data, error } = await _supabase.auth.signUp({ email, password });
+    const { data, error } = await myBotDB.auth.signUp({ email, password });
 
     if (error) {
         if (error.message.includes("already registered") || error.status === 422) {
@@ -269,7 +269,7 @@ async function handleSignUp() {
     try {
         // 4. Call Supabase to create the user
         // Note: We use '_supabase' to avoid the naming conflict error
-        const { data, error } = await _supabase.auth.signUp({
+        const { data, error } = await myBotDB.auth.signUp({
             email: email,
             password: password,
         });
