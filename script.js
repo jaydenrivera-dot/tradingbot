@@ -225,3 +225,61 @@ function validateAndCheckSafety() {
         document.getElementById('safetyStatus').innerText = "✅ Monitoring limits...";
     }
 }
+/**
+ * Handles the "Create Account" process using Supabase Auth
+ */
+async function handleSignUp() {
+    // 1. Grab values from the input fields
+    const email = document.getElementById('auth-email').value;
+    const password = document.getElementById('auth-password').value;
+    const errorMsg = document.getElementById('auth-error');
+    const signupBtn = document.getElementById('signupBtn');
+
+    // 2. Clear previous errors and show "Loading" state
+    errorMsg.innerHTML = "";
+    signupBtn.innerText = "Creating Account...";
+    signupBtn.disabled = true;
+
+    // 3. Basic Validation
+    if (!isValidEmail(email)) {
+        errorMsg.innerText = "Please enter a valid email address.";
+        signupBtn.innerText = "Create Account";
+        signupBtn.disabled = false;
+        return;
+    }
+
+    if (password.length < 6) {
+        errorMsg.innerText = "Password must be at least 6 characters.";
+        signupBtn.innerText = "Create Account";
+        signupBtn.disabled = false;
+        return;
+    }
+
+    try {
+        // 4. Call Supabase to create the user
+        // Note: We use '_supabase' to avoid the naming conflict error
+        const { data, error } = await _supabase.auth.signUp({
+            email: email,
+            password: password,
+        });
+
+        if (error) {
+            // Check if the user already exists
+            if (error.message.includes("already registered") || error.status === 422) {
+                errorMsg.innerHTML = `Account already exists. <a href="#" onclick="toggleAuthMode()" style="color: #3b82f6; text-decoration: underline; cursor: pointer;">Login instead.</a>`;
+            } else {
+                errorMsg.innerText = error.message;
+            }
+            signupBtn.innerText = "Create Account";
+            signupBtn.disabled = false;
+        } else {
+            // 5. Success! Prompt for email confirmation
+            alert("Success! Please check your email inbox to confirm your account before logging in.");
+            toggleAuthMode(); // Switches the UI back to the Login screen
+        }
+    } catch (err) {
+        errorMsg.innerText = "An unexpected error occurred. Please try again.";
+        signupBtn.innerText = "Create Account";
+        signupBtn.disabled = false;
+    }
+}
