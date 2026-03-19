@@ -246,9 +246,30 @@ async function fetchLivePrice(symbol) {
 }
 function startDashboardServices() {
     pingServer();
-    
-    // Fetch the live price of the S&P 500 (SPY) when the dashboard loads
-    fetchLivePrice('SPY'); 
+
+    updateDashboardPrice('SPY'); 
+
+    setInterval(() => {
+        updateDashboardPrice('SPY');
+    }, 30000); 
+}
     
     console.log("Monitoring Market Activity...");
+}
+async function updateDashboardPrice(symbol) {
+    try {
+        const response = await fetch(`${RENDER_URL}/api/quote/${symbol}`);
+        const data = await response.json();
+
+        if (data.c) {
+            // This targets the $0.00 text in your budget card
+            const priceElement = document.getElementById('budgetText');
+            priceElement.innerText = `$${data.c.toFixed(2)}`;
+
+            // Add a little log so you know it worked
+            console.log(`Updated ${symbol} price: ${data.c}`);
+        }
+    } catch (err) {
+        console.error("Dashboard update failed:", err);
+    }
 }
